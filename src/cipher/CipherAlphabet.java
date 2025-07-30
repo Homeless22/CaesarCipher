@@ -50,7 +50,7 @@ public class CipherAlphabet {
 
     /***
      * Возвращает индекс символа алфавита
-     * @param char символ алфавита
+     * @param symbol символ алфавита
      * @return индекс символа
      */
     public int getIndexByChar(char symbol) {
@@ -59,7 +59,7 @@ public class CipherAlphabet {
 
     /***
      * Возвращает символ алфавита по индексу
-     * @param int индекс символа
+     * @param index индекс символа
      * @return символ алфавита
      */
     public char getCharByIndex(int index) {
@@ -68,7 +68,7 @@ public class CipherAlphabet {
 
     /***
      * Возвращает ожидаемую частоту использования символа алфавита
-     * @param char символ алфавита
+     * @param letter символ алфавита
      * @return ожидаемая частота использования символа алфавита
      */
     public Double getLetterFrequency(Character letter) {

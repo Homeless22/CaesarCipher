@@ -47,7 +47,7 @@ public class CaeserCipherMenu {
         }
     }
 
-    private String inputFile(String prompt) {
+    private String inputFilePath(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine();
     }
@@ -58,10 +58,14 @@ public class CaeserCipherMenu {
      */
     private void encryptFile() {
         System.out.println("\nШифрование файла");
-        String inputFile = inputFile("Введите путь к исходному файлу: ");
-        String outputFile = inputFile("Введите путь для зашифрованного файла: ");
-        cipherFileProcessor.validateFiles(inputFile, outputFile);
-
+        String sourceFilePath = inputFilePath("Введите путь к исходному файлу: ");
+        String destinationFilePath = inputFilePath("Введите путь для зашифрованного файла: ");
+        try {
+            cipherFileProcessor.validateFiles(sourceFilePath, destinationFilePath);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return;
+        }
         System.out.print("Введите ключ шифрования: ");
         int shift;
         try {
@@ -72,7 +76,7 @@ public class CaeserCipherMenu {
         }
 
         try {
-            cipherFileProcessor.encryptFile(inputFile, outputFile, shift);
+            cipherFileProcessor.encryptFile(sourceFilePath, destinationFilePath, shift);
             System.out.println("Файл успешно зашифрован");
         } catch (Exception e) {
             System.out.println("Ошибка при шифровании: " + e.getMessage());
@@ -85,10 +89,10 @@ public class CaeserCipherMenu {
      */
     private void decryptFile() {
         System.out.println("\nРасшифровка файла");
-        String inputFile = inputFile("Введите путь к зашифрованному файлу: ");
-        String outputFile = inputFile("Введите путь для расшифрованного файла: ");
+        String sourceFilePath = inputFilePath("Введите путь к зашифрованному файлу: ");
+        String destinationFilePath = inputFilePath("Введите путь для расшифрованного файла: ");
         try {
-            cipherFileProcessor.validateFiles(inputFile, outputFile);
+            cipherFileProcessor.validateFiles(sourceFilePath, destinationFilePath);
         } catch (Exception e) {
             System.out.println("Введены ");
             return;
@@ -104,7 +108,7 @@ public class CaeserCipherMenu {
         }
 
         try {
-            cipherFileProcessor.decryptFile(inputFile, outputFile, shift);
+            cipherFileProcessor.decryptFile(sourceFilePath, destinationFilePath, shift);
             System.out.println("Файл успешно расшифрован");
         } catch (Exception e) {
             System.out.println("Ошибка при расшифровке: " + e.getMessage());
@@ -117,14 +121,14 @@ public class CaeserCipherMenu {
      */
     private void bruteForce() {
         System.out.println("\nВзлом шифра");
-        String inputFile = inputFile("Введите путь к зашифрованному файлу: ");
-        String outputFile = inputFile("Введите путь для взломанного файла: ");
-        cipherFileProcessor.validateFiles(inputFile, outputFile);
+        String sourceFilePath = inputFilePath("Введите путь к зашифрованному файлу: ");
+        String destinationFilePath = inputFilePath("Введите путь для взломанного файла: ");
+        cipherFileProcessor.validateFiles(sourceFilePath, destinationFilePath);
 
         try {
-            int shift = cipherFileProcessor.bruteForce(inputFile);
+            int shift = cipherFileProcessor.bruteForce(sourceFilePath);
             System.out.println("Найденный ключ: " + shift);
-            cipherFileProcessor.decryptFile(inputFile, outputFile, shift);
+            cipherFileProcessor.decryptFile(sourceFilePath, destinationFilePath, shift);
             System.out.println("Файл успешно расшифрован");
         } catch (Exception e) {
             System.out.println("Ошибка при взломе шифра: " + e.getMessage());

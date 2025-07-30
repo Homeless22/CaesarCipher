@@ -1,5 +1,7 @@
 package cipher;
 
+import exception.InvalidFilePathException;
+
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
@@ -11,18 +13,18 @@ public class CaesarCipherFileProcessor {
     private final CaesarCipher caesarCipher;
 
     public CaesarCipherFileProcessor(CaesarCipher caesarCipher) {
-        this.caesarCipher = caesarCipher;
+          this.caesarCipher = caesarCipher;
     }
 
     /***
      * Применение сдвига к тексту из исходного файла с сохранением в зашифрованный
-     * @param sourceFile шифруемый файл
-     * @param destFile зашифрованный файл
+     * @param sourceFilePath шифруемый файл
+     * @param destinationFilePath зашифрованный файл
      * @param shift значение сдвига
      */
-    private void applyShift(String sourceFile, String destFile, int shift) {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFile)/*, Charset.forName("Cp1251")*/));
-             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)/*, Charset.forName("Cp1251")*/))) {
+    private void applyShift(String sourceFilePath, String destinationFilePath, int shift) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFilePath)/*, Charset.forName("Cp1251")*/));
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destinationFilePath)/*, Charset.forName("Cp1251")*/))) {
             String line = reader.readLine();
             while (line != null) {
                 String encryptLine = caesarCipher.encrypt(line, shift);
@@ -36,33 +38,33 @@ public class CaesarCipherFileProcessor {
 
     /***
      * Шифрование файла
-     * @param sourceFile шифруемый файл
-     * @param destFile зашифрованный файл
+     * @param sourceFilePath шифруемый файл
+     * @param destinationFilePath зашифрованный файл
      * @param shift значение сдвига
      */
-    public void encryptFile(String sourceFile, String destFile, int shift) {
-        applyShift(sourceFile, destFile, shift);
+    public void encryptFile(String sourceFilePath, String destinationFilePath, int shift) {
+        applyShift(sourceFilePath, destinationFilePath, shift);
     }
 
     /***
      * Расшифровка файла
-     * @param sourceFile зашифрованный файл
-     * @param destFile файл после расшифровки
+     * @param sourceFilePath зашифрованный файл
+     * @param destinationFilePath файл после расшифровки
      * @param shift значение сдвига
      */
-    public void decryptFile(String sourceFile, String destFile, int shift) {
-        applyShift(sourceFile, destFile, -1 * shift);
+    public void decryptFile(String sourceFilePath, String destinationFilePath, int shift) {
+        applyShift(sourceFilePath, destinationFilePath, -1 * shift);
     }
 
     /***
      * Расшифровка файла методом взлома (перебора сдвига)
-     * @param sourceFile зашифрованный файл
+     * @param sourceFilePath зашифрованный файл
      * @return значение сдвига
      */
-    public int bruteForce(String sourceFile) {
+    public int bruteForce(String sourceFilePath) {
         String text;
         try {
-            Path path = Paths.get(sourceFile);
+            Path path = Paths.get(sourceFilePath);
             text = Files.readString(path);
         } catch (MalformedInputException e) {
             throw new RuntimeException("Содержимое файла не соответствует кодировке " + Charset.defaultCharset().name());
@@ -72,21 +74,26 @@ public class CaesarCipherFileProcessor {
         return caesarCipher.bruteForce(text);
     }
 
-    public void validateFiles(String sourceFile, String destFile) {
-        if (sourceFile == null || sourceFile.isEmpty()) {
-            throw new RuntimeException("Путь к исходному файлу не заполнен");
+    /***
+     * Проверка файлов
+     * @param sourceFilePath исходный файл
+     * @param destinationFilePath итоговый файл
+     */
+    public void validateFiles(String sourceFilePath, String destinationFilePath) {
+        if (sourceFilePath == null || sourceFilePath.isEmpty()) {
+            throw new InvalidFilePathException("Путь к исходному файлу не заполнен");
         }
 
-        if (destFile == null || destFile.isEmpty()) {
-            throw new RuntimeException("Путь к итоговому файлу не заполнен");
+        if (destinationFilePath == null || destinationFilePath.isEmpty()) {
+            throw new InvalidFilePathException("Путь к итоговому файлу не заполнен");
         }
 
-        if (!Files.exists(Path.of(sourceFile))) {
-            throw new RuntimeException("Исходный файл " + sourceFile + " не найден");
+        if (!Files.exists(Path.of(sourceFilePath))) {
+            throw new InvalidFilePathException("Исходный файл " + sourceFilePath + " не найден");
         }
 
-        if (sourceFile.equals(destFile)) {
-            throw new RuntimeException("Исходный файл совпадает с итоговым");
+        if (sourceFilePath.equals(destinationFilePath)) {
+            throw new InvalidFilePathException("Исходный файл совпадает с итоговым");
         }
     }
 }
